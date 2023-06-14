@@ -7,6 +7,7 @@ using Microsoft.Data.SqlClient;
 
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace BL
 {
@@ -19,7 +20,7 @@ namespace BL
             {
                 using (DL.CescalonaSicossContext contex = new DL.CescalonaSicossContext())
                 {
-                    int RowsAfected = contex.Database.ExecuteSqlRaw($"UsuarioAdd '{cine.UserName}', @Password", new SqlParameter("@Password", cine.Password));
+                    int RowsAfected = contex.Database.ExecuteSqlRaw($"UsuarioAdd '{cine.UserName}', '{ cine.Password}' ");
 
                     if (RowsAfected > 0)
                     {
@@ -41,14 +42,14 @@ namespace BL
 
             return result;
         }
-        public static ML.Result GetByUserName(ML.Usuario userName)
+        public static ML.Result GetByUserName(string userName)
         {
             ML.Result result = new ML.Result();
             try
             {
                 using (DL.CescalonaSicossContext context = new DL.CescalonaSicossContext())
                 {
-                    var objUsuario = context.Usuarios.FromSqlRaw($"UsuarioGetByUserName '{userName.UserName}' ").AsEnumerable().FirstOrDefault();
+                    var objUsuario = context.Usuarios.FromSqlRaw($"UsuarioGetByUserName '{userName}' ").AsEnumerable().FirstOrDefault();
 
                     //result.Objects = new List<object>();
 
@@ -80,6 +81,45 @@ namespace BL
                 result.Ex = ex;
             }
 
+            return result;
+        }
+        public static ML.Result HistorialGetByIdUsuario(int? idUsuario)
+        {
+            ML.Result result = new ML.Result();
+            try
+            {
+                using (DL.CescalonaSicossContext contex = new DL.CescalonaSicossContext())
+                {
+                    var query = contex.Historials.FromSqlRaw($"HistorialGetByIdUsuario {idUsuario}");
+
+                    if (query != null)
+                    {
+                        result.Objects = new List<object>();
+
+                        foreach (var RowsAfected in query)
+                        {
+                            ML.Historial historial = new ML.Historial();
+
+                            ML.Historial cine = new ML.Historial();
+                            cine.IdHistorial = RowsAfected.IdHistorial;
+                            cine.Digito = RowsAfected.Numero.Value;
+                            cine.SuperDigito = RowsAfected.Resultado.Value;
+                            cine.Fecha = RowsAfected.FechaHora.ToString();
+                            cine.Usuario = new ML.Usuario();
+                            cine.Usuario.IdUsuario = RowsAfected.IdUsuario.Value;
+                            result.Objects.Add(cine);
+
+                            result.Objects.Add(historial);
+                        }
+                    }
+                    result.Correct = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Correct = false;
+                result.ErrorMessage = ex.Message;
+            }
             return result;
         }
     }

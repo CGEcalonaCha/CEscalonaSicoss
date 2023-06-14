@@ -46,7 +46,9 @@ public partial class CescalonaSicossContext : DbContext
 
             entity.HasIndex(e => e.UserName, "UQ__Usuario__C9F28456275162F8").IsUnique();
 
-            entity.Property(e => e.Password).HasMaxLength(20);
+            entity.Property(e => e.Password)
+                .HasMaxLength(50)
+                .IsUnicode(false);
             entity.Property(e => e.UserName)
                 .HasMaxLength(50)
                 .IsUnicode(false);

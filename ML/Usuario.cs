@@ -10,7 +10,7 @@ namespace ML
     {
         public int IdUsuario { get; set; }
         public string UserName { get; set; }
-        public byte[] Password { get; set; }
+        public string Password { get; set; }
         public List<object> Usuarios { get; set; }
     }
 }

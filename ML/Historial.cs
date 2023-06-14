@@ -8,11 +8,11 @@ namespace ML
 {
     public class Historial
     {
-        public int IdHistoial { get; set; }
-        public int Numero { get; set; }
-        public int Resultado { get; set; }
-        public string FechaHora { get; set; }
-        public List<object> Histoiales { get; set; }
-        public ML.Usuario  Usuario  { get; set; }
+        public int IdHistorial { get; set; }
+        public int Digito { get; set; }
+        public int SuperDigito { get; set; }
+        public string Fecha { get; set; }
+        public ML.Usuario Usuario { get; set; }
+        public List<object> Historials { get; set; }
     }
 }

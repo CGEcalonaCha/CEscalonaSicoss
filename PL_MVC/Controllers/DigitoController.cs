@@ -4,71 +4,82 @@ namespace PL_MVC.Controllers
 {
     public class DigitoController : Controller
     {
-        //Inyeccion de dependencias-- patron de diseño
-        private readonly IConfiguration _configuration;
-        private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _hostingEnvironment;
-
-        public DigitoController(IConfiguration configuration, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment)
-        {
-            _configuration = configuration;
-            _hostingEnvironment = hostingEnvironment;
-        }
-
         [HttpGet]
-        public ActionResult Form()
+        public ActionResult VistaGeneral()
         {
             ML.Historial historial = new ML.Historial();
-            int? IdUsuario = HttpContext.Session.GetInt32("IdUsuario");
-            ML.Result result = BL.Historial.HistorialGetByIdUsuario(IdUsuario);
+            ML.Result result = new ML.Result();
+            int? IdUsuario = HttpContext.Session.GetInt32("IdUsuario");//Obtener el idUsuario
+            result = BL.Usuario.HistorialGetByIdUsuario(IdUsuario.Value);//Obtener el historial del usuario
 
-            historial.Histoiales = result.Objects;
-            return View(historial);
-
+            if (result.Correct)
+            {
+                historial.Historials = result.Objects;
+                return View(historial);
+            }
+            else
+            {
+                return View(historial);
+            }
+            //return View(historial);
         }
-
         [HttpPost]
-        public ActionResult Form(ML.Historial historial)
+        public ActionResult VistaGeneral(ML.Historial historial)
         {
             ML.Result result = new ML.Result();
-            int? IdUsuario = HttpContext.Session.GetInt32("IdUsuario");
-
+            int? IdUsuario = HttpContext.Session.GetInt32("IdUsuario");//Obtener el IdUsuario
             historial.Usuario = new ML.Usuario();
-            historial.Usuario.IdUsuario = IdUsuario.Value;
-            historial.Resultado = BL.Historial.CalcularSuperDigito(historial.Numero.ToString());
-
-            ML.Result resultAdd = BL.Historial.Add(historial);
-            result = BL.Historial.HistorialGetByIdUsuario(IdUsuario.Value);
+            historial.Usuario.IdUsuario = IdUsuario.Value;//guardarlo en ML.Historial
+            historial.SuperDigito = BL.Historial.CalcularSuperDigito(historial.Digito);//Calcular el SuperDigito
+            ML.Result resultAdd = BL.Historial.Add(historial);//agregarlo a la BD
+            result = BL.Usuario.HistorialGetByIdUsuario(IdUsuario.Value);//Obtener el historial
 
             if (result.Correct && resultAdd.Correct)
             {
-                historial.Histoiales = result.Objects;
+                historial.Historials = result.Objects;
                 return View(historial);
             }
             else
             {
                 return View(historial);
             }
-
+            //return View(historial);
         }
 
         [HttpGet]
-
-        public ActionResult Delete(int idHistorial)
+        public ActionResult HistorialGetByIdUsuario(ML.Historial historial)
         {
-            ML.Result resultDelete = new ML.Result();
-            resultDelete = BL.Historial.Delete(idHistorial);
+            int? IdUsuario = HttpContext.Session.GetInt32("IdUsuario");
+            ML.Result result = BL.Usuario.HistorialGetByIdUsuario(IdUsuario.Value);//Obtener el historial
+            //historial.SuperDigito = BL.Historial.CalcularSuperDigito(historial.Digito);//checar si hacerlo
 
-            if (resultDelete.Correct)
+            if (result.Correct)
             {
-                ViewBag.Message = "EL REGISTRO SE ELIMINO CORRECTAMENTE";
-                return PartialView("Modal");
-
+                historial.Historials = result.Objects;
+                return View("VistaGeneral", historial);
+                //return View("VistaGeneral");
             }
             else
             {
-                ViewBag.Message = "EL REGISTRO NO SE ELIMINO CORRECTAMENTE";
-                return PartialView("Modal");
+                return View(historial);
             }
+        }
+
+        [HttpGet]
+        public ActionResult Delete(ML.Historial historial)
+        {
+            ML.Result result = new ML.Result();
+
+            result = BL.Historial.Delete(historial);
+            if (result.Correct)
+            {
+                ViewBag.Message = "Se elimino el registro satisfactoriamente";
+            }
+            else
+            {
+                ViewBag.Message = "Ocurrio un error al eliminar el registro";
+            }
+            return View("Modal");
         }
     }
 }

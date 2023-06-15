@@ -9,8 +9,8 @@ namespace PL_MVC.Controllers
         {
             ML.Historial historial = new ML.Historial();
             ML.Result result = new ML.Result();
-            int? IdUsuario = HttpContext.Session.GetInt32("IdUsuario");//Obtener el idUsuario
-            result = BL.Usuario.HistorialGetByIdUsuario(IdUsuario.Value);//Obtener el historial del usuario
+            int? IdUsuario = HttpContext.Session.GetInt32("IdUsuario");//Obtener el idUsuario de sesion
+            result = BL.Usuario.HistorialGetByIdUsuario(IdUsuario.Value);
 
             if (result.Correct)
             {
@@ -27,7 +27,7 @@ namespace PL_MVC.Controllers
         public ActionResult VistaGeneral(ML.Historial historial)
         {
             ML.Result result = new ML.Result();
-            int? IdUsuario = HttpContext.Session.GetInt32("IdUsuario");//Obtener el IdUsuario
+            int? IdUsuario = HttpContext.Session.GetInt32("IdUsuario");//Obtener el IdUsuario sesion
             historial.Usuario = new ML.Usuario();
             historial.Usuario.IdUsuario = IdUsuario.Value;//guardarlo en ML.Historial
             historial.SuperDigito = BL.Historial.CalcularSuperDigito(historial.Digito);//Calcular el SuperDigito
@@ -43,9 +43,7 @@ namespace PL_MVC.Controllers
             {
                 return View(historial);
             }
-            //return View(historial);
         }
-
         [HttpGet]
         public ActionResult HistorialGetByIdUsuario(ML.Historial historial)
         {
@@ -64,7 +62,6 @@ namespace PL_MVC.Controllers
                 return View(historial);
             }
         }
-
         [HttpGet]
         public ActionResult Delete(ML.Historial historial)
         {

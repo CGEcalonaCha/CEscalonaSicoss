@@ -109,7 +109,7 @@ namespace BL
                             cine.Usuario.IdUsuario = RowsAfected.IdUsuario.Value;
                             result.Objects.Add(cine);
 
-                            result.Objects.Add(historial);
+               
                         }
                     }
                     result.Correct = true;
